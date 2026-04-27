@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛博开发者 | Cyber Developer</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 赛博风格颜色变量 */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-purple: #8a2be2;
+            --neon-green: #39ff14;
+            --dark-bg: #0a0a0f;
+            --card-bg: #12121a;
+            --text-primary: #e0e0e0;
+        }
+
+        /* 全局样式 */
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* 动态网格背景 */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        /* 霓虹文字效果 */
+        .neon-text {
+            text-shadow: 
+                0 0 5px var(--neon-blue),
+                0 0 10px var(--neon-blue),
+                0 0 20px var(--neon-blue),
+                0 0 40px var(--neon-blue);
+        }
+
+        .neon-pink-text {
+            text-shadow: 
+                0 0 5px var(--neon-pink),
+                0 0 10px var(--neon-pink),
+                0 0 20px var(--neon-pink);
+        }
+
+        /* 文字流光动画 */
+        .glitch-text {
+            position: relative;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { text-shadow: 2px 2px 0 var(--neon-blue), -2px -2px 0 var(--neon-pink); }
+            25% { text-shadow: -2px 2px 0 var(--neon-blue), 2px -2px 0 var(--neon-pink); }
+            50% { text-shadow: 2px -2px 0 var(--neon-blue), -2px 2px 0 var(--neon-pink); }
+            75% { text-shadow: -2px -2px 0 var(--neon-blue), 2px 2px 0 var(--neon-pink); }
+        }
+
+        /* 霓虹边框效果 */
+        .neon-border {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 
+                0 0 5px var(--neon-blue),
+                0 0 10px var(--neon-blue),
+                inset 0 0 5px rgba(0, 243, 255, 0.1);
+        }
+
+        /* 按钮悬停效果 */
+        .cyber-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cyber-btn:hover::before {
+            left: 100%;
+        }
+
+        .cyber-btn:hover {
+            box-shadow: 
+                0 0 10px var(--neon-blue),
+                0 0 20px var(--neon-blue),
+                0 0 30px var(--neon-blue);
+            transform: translateY(-2px);
+        }
+
+        /* 卡片悬浮效果 */
+        .cyber-card {
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+
+        .cyber-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 
+                0 10px 30px rgba(0, 243, 255, 0.2),
+                0 0 20px rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-pink);
+        }
+
+        /* 技能进度条动画 */
+        .skill-bar {
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            transition: width 1.5s ease;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* 导航栏滚动效果 */
+        .nav-scrolled {
+            background: rgba(10, 10, 15, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 243, 255, 0.2);
+        }
+
+        /* 项目详情展开动画 */
+        .project-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .project-details.active {
+            max-height: 500px;
+        }
+
+        /* 扫描线效果 */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .cyber-grid {
+                background-size: 30px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 扫描线效果 -->
+    <div class="scanline"></div>
+    
+    <!-- 动态网格背景 -->
+    <div class="cyber-grid"></div>
+
+    <!-- 导航栏 -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <a href="#home" class="text-2xl font-bold neon-text text-cyan-400">
+                        <i class="fas fa-bolt mr-2"></i>CYBER.DEV
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="flex space-x-8">
+                        <a href="#home" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300">首页</a>
+                        <a href="#about" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300">关于我</a>
+                        <a href="#skills" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300">技能</a>
+                        <a href="#projects" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300">项目</a>
+                        <a href="#contact" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300">联系</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-cyan-400 hover:text-cyan-300">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-900/95 backdrop-blur-sm">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#home" class="block px-3 py-2 text-gray-300 hover:text-cyan-400">首页</a>
+                <a href="#about" class="block px-3 py-2 text-gray-300 hover:text-cyan-400">关于我</a>
+                <a href="#skills" class="block px-3 py-2 text-gray-300 hover:text-cyan-400">技能</a>
+                <a href="#projects" class="block px-3 py-2 text-gray-300 hover:text-cyan-400">项目</a>
+                <a href="#contact" class="block px-3 py-2 text-gray-300 hover:text-cyan-400">联系</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero区域 -->
+    <section id="home" class="min-h-screen flex items-center justify-center relative pt-16">
+        <div class="text-center z-10 px-4">
+            <div class="mb-6">
+                <span class="text-cyan-400 text-lg tracking-widest">[ 系统初始化中... ]</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 glitch-text">
+                <span class="neon-text text-cyan-400">全栈开发者</span>
+            </h1>
+            <h2 class="text-2xl md:text-4xl font-semibold mb-8 neon-pink-text text-pink-500">
+                CYBER DEVELOPER
+            </h2>
+            <p class="text-gray-400 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
+                穿梭于代码与元宇宙之间，构建未来数字世界的架构师
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#projects" class="cyber-btn neon-border px-8 py-3 text-cyan-400 font-semibold rounded">
+                    <i class="fas fa-rocket mr-2"></i>查看项目
+                </a>
+                <a href="#contact" class="cyber-btn border-2 border-pink-500 px-8 py-3 text-pink-500 font-semibold rounded hover:bg-pink-500/10">
+                    <i class="fas fa-envelope mr-2"></i>联系我
+                </a>
+            </div>
+            <div class="mt-16 animate-bounce">
+                <a href="#about" class="text-cyan-400">
+                    <i class="fas fa-chevron-down text-3xl"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我 -->
+    <section id="about" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold neon-text text-cyan-400 mb-4">
+                    <i class="fas fa-user-cog mr-3"></i>关于我
+                </h2>
+                <div class="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 mx-auto"></div>
+            </div>
+            <div class="cyber-card neon-border rounded-lg p-8 md:p-12">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="text-center">
+                        <div class="w-48 h-48 mx-auto mb-6 rounded-full neon-border overflow-hidden bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center">
+                            <i class="fas fa-code text-6xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-cyan-400 mb-2">赛博开发者</h3>
+                        <p class="text-gray-400">Full Stack Developer</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                            你好，我是一名热爱技术的全栈开发者，专注于构建高性能、用户友好的Web应用程序。
+                        </p>
+                        <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                            在元宇宙的浪潮中，我致力于将前沿技术与创意设计相结合，创造出令人惊叹的数字体验。
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 mt-8">
+                            <div class="text-center p-4 bg-gray-800/50 rounded">
+                                <div class="text-3xl font-bold text-cyan-400">5+</div>
+                                <div class="text-gray-400">年开发经验</div>
+                            </div>
+                            <div class="text-center p-4 bg-gray-800/50 rounded">
+                                <div class="text-3xl font-bold text-pink-500">50+</div>
+                                <div class="text-gray-400">完成项目</div>
+                            </div>
+                            <div class="text-center p-4 bg-gray-800/50 rounded">
+                                <div class="text-3xl font-bold text-purple-500">100+</div>
+                                <div class="text-gray-400">满意客户</div>
+                            </div>
+                            <div class="text-center p-4 bg-gray-800/50 rounded">
+                                <div class="text-3xl font-bold text-green-400">∞</div>
+                                <div class="text-gray-400">学习热情</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技能展示 -->
+    <section id="skills" class="py-20 px-4 bg-gray-900/30">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold neon-text text-cyan-400 mb-4">
+                    <i class="fas fa-microchip mr-3"></i>技能矩阵
+                </h2>
+                <div class="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 mx-auto"></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 前端技能 -->
+                <div class="cyber-card neon-border rounded-lg p-8">
+                    <h3 class="text-2xl font-bold text-cyan-400 mb-6">
+                        <i class="fas fa-laptop-code mr-2"></i>前端开发
+                    </h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">HTML5 / CSS3</span>
+                                <span class="text-cyan-400">95%</span>
+                            </div>
+                            <div class="skill-bar h-3 rounded-full">
+                                <div class="skill-progress rounded-full" data-width="95"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">JavaScript / TypeScript</span>
+                                <span class="text-cyan-400">90%</span>
+                            </div>
+                            <div class="skill-bar h-3 rounded-full">
+                                <div class="skill-progress rounded-full" data-width="90"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">React / Vue</span>
+                                <span class="text-cyan-400">88%</span>
+                            </div>
+                            <div class="skill-bar h-3 rounded-full">
+                                <div class="skill-progress rounded-full" data-width="88"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Three.js / WebGL</span>
+                                <span class="text-cyan-400">75%</span>
+                            </div>
+                            <div class="skill-bar h-3 rounded-full">
+                                <div class="skill-progress rounded-full" data-width="75"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 后端技能 -->
+                <div class="cyber-card neon-border rounded-lg p-8">
+                    <h3 class="text-2xl font-bold text-pink-500 mb-6">
+                        <i class="fas fa-server mr-2"></i>后端开发
+                    </h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Node.js / Express</span>
+                                <span class="text-pink-500">92%</span>
+                            </div>
+                            <div class="skill-bar h-3 rounded-full">
+                                <div class="skill-progress rounded-full" style="background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));" data-width="92"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Python / Django</span>
+                                <span class="text-pink-500">85%</span>
+                            </div>
+                            <div class="skill-bar h-3 rounded-full">
+                                <div class="skill-progress rounded-full" style="background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">MySQL / MongoDB</span>
+                                <span class="text-pink-500">88%</span>
+                            </div>
+                            <div class="skill-bar h-3 rounded-full">
+                                <div class="skill-progress rounded-full" style="background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));" data-width="88"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-300">Docker / Kubernetes</span>
+                                <span class="text-pink-500">78%</span>
+                            </div>
+                            <div class="skill-bar h-3 rounded-full">
+                                <div class="skill-progress rounded-full" style="background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));" data-width="78"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 技术标签云 -->
+            <div class="mt-12 text-center">
+                <h3 class="text-xl font-semibold text-gray-300 mb-6">技术栈</h3>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="px-4 py-2 bg-cyan-400/10 border border-cyan-400 rounded-full text-cyan-400 text-sm">Git</span>
+                    <span class="px-4 py-2 bg-pink-500/10 border border-pink-500 rounded-full text-pink-500 text-sm">AWS</span>
+                    <span class="px-4 py-2 bg-purple-500/10 border border-purple-500 rounded-full text-purple-500 text-sm">GraphQL</span>
+                    <span class="px-4 py-2 bg-green-400/10 border border-green-400 rounded-full text-green-400 text-sm">Redis</span>
+                    <span class="px-4 py-2 bg-cyan-400/10 border border-cyan-400 rounded-full text-cyan-400 text-sm">Webpack</span>
+                    <span class="px-4 py-2 bg-pink-500/10 border border-pink-500 rounded-full text-pink-500 text-sm">Tailwind</span>
+                    <span class="px-4 py-2 bg-purple-500/10 border border-purple-500 rounded-full text-purple-500 text-sm">Next.js</span>
+                    <span class="px-4 py-2 bg-green-400/10 border border-green-400 rounded-full text-green-400 text-sm">PostgreSQL</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 项目作品 -->
+    <section id="projects" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold neon-text text-cyan-400 mb-4">
+                    <i class="fas fa-project-diagram mr-3"></i>项目作品
+                </h2>
+                <div class="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 mx-auto"></div>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 项目1 -->
+                <div class="cyber-card neon-border rounded-lg overflow-hidden project-card">
+                    <div class="h-48 bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+                        <i class="fas fa-vr-cardboard text-6xl text-white"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-cyan-400 mb-2">元宇宙社交平台</h3>
+                        <p class="text-gray-400 mb-4">基于Web3.0的虚拟现实社交空间</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-cyan-400/10 text-cyan-400 text-xs rounded">React</span>
+                            <span class="px-2 py-1 bg-pink-500/10 text-pink-500 text-xs rounded">Three.js</span>
+                            <span class="px-2 py-1 bg-purple-500/10 text-purple-500 text-xs rounded">Web3</span>
+                        </div>
+                        <button class="cyber-btn w-full py-2 text-cyan-400 border border-cyan-400 rounded toggle-details">
+                            查看详情 <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div class="project-details mt-4">
+                            <p class="text-gray-300 text-sm mb-3">
+                                这是一个创新的元宇宙社交平台，用户可以创建虚拟形象，在3D空间中与他人互动，参加虚拟活动。
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-cyan-400 hover:text-cyan-300"><i class="fab fa-github text-xl"></i></a>
+                                <a href="#" class="text-pink-500 hover:text-pink-400"><i class="fas fa-external-link-alt text-xl"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 项目2 -->
+                <div class="cyber-card neon-border rounded-lg overflow-hidden project-card">
+                    <div class="h-48 bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-robot text-6xl text-white"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-pink-500 mb-2">AI智能助手</h3>
+                        <p class="text-gray-400 mb-4">基于GPT的企业级智能客服系统</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-cyan-400/10 text-cyan-400 text-xs rounded">Python</span>
+                            <span class="px-2 py-1 bg-pink-500/10 text-pink-500 text-xs rounded">TensorFlow</span>
+                            <span class="px-2 py-1 bg-purple-500/10 text-purple-500 text-xs rounded">FastAPI</span>
+                        </div>
+                        <button class="cyber-btn w-full py-2 text-pink-500 border border-pink-500 rounded toggle-details">
+                            查看详情 <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div class="project-details mt-4">
+                            <p class="text-gray-300 text-sm mb-3">
+                                企业级AI客服系统，支持多轮对话、情感分析、知识库管理，大幅提升客服效率。
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-cyan-400 hover:text-cyan-300"><i class="fab fa-github text-xl"></i></a>
+                                <a href="#" class="text-pink-500 hover:text-pink-400"><i class="fas fa-external-link-alt text-xl"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 项目3 -->
+                <div class="cyber-card neon-border rounded-lg overflow-hidden project-card">
+                    <div class="h-48 bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                        <i class="fas fa-chart-line text-6xl text-white"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-purple-500 mb-2">数据可视化平台</h3>
+                        <p class="text-gray-400 mb-4">实时数据分析与可视化仪表盘</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-cyan-400/10 text-cyan-400 text-xs rounded">Vue</span>
+                            <span class="px-2 py-1 bg-pink-500/10 text-pink-500 text-xs rounded">D3.js</span>
+                            <span class="px-2 py-1 bg-purple-500/10 text-purple-500 text-xs rounded">WebSocket</span>
+                        </div>
+                        <button class="cyber-btn w-full py-2 text-purple-500 border border-purple-500 rounded toggle-details">
+                            查看详情 <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div class="project-details mt-4">
+                            <p class="text-gray-300 text-sm mb-3">
+                                实时数据监控平台，支持多种图表类型，可自定义仪表盘，数据实时更新。
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-cyan-400 hover:text-cyan-300"><i class="fab fa-github text-xl"></i></a>
+                                <a href="#" class="text-pink-500 hover:text-pink-400"><i class="fas fa-external-link-alt text-xl"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我 -->
+    <section id="contact" class="py-20 px-4 bg-gray-900/30">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold neon-text text-cyan-400 mb-4">
+                    <i class="fas fa-paper-plane mr-3"></i>联系我
+                </h2>
+                <div class="w-32 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 mx-auto"></div>
+            </div>
+            <div class="cyber-card neon-border rounded-lg p-8 md:p-12">
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="text-2xl font-bold text-cyan-400 mb-6">让我们连接</h3>
+                        <p class="text-gray-300 mb-8">
+                            有项目想法？或者只是想打个招呼？随时联系我，我会尽快回复！
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope text-cyan-400 text-xl w-8"></i>
+                                <span class="text-gray-300">cyber@developer.com</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-pink-500 text-xl w-8"></i>
+                                <span class="text-gray-300">元宇宙，赛博空间</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock text-purple-500 text-xl w-8"></i>
+                                <span class="text-gray-300">24/7 在线</span>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex space-x-4">
+                            <a href="#" class="w-12 h-12 neon-border rounded-full flex items-center justify-center text-cyan-400 hover:bg-cyan-400/10 transition-colors">
+                                <i class="fab fa-github text-xl"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 border-2 border-pink-500 rounded-full flex items-center justify-center text-pink-500 hover:bg-pink-500/10 transition-colors">
+                                <i class="fab fa-linkedin text-xl"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 border-2 border-purple-500 rounded-full flex items-center justify-center text-purple-500 hover:bg-purple-500/10 transition-colors">
+                                <i class="fab fa-twitter text-xl"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 border-2 border-green-400 rounded-full flex items-center justify-center text-green-400 hover:bg-green-400/10 transition-colors">
+                                <i class="fab fa-weixin text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <form id="contact-form" class="space-y-6">
+                            <div>
+                                <label class="block text-gray-300 mb-2">姓名</label>
+                                <input type="text" class="w-full bg-gray-800/50 border border-cyan-400 rounded px-4 py-3 text-gray-300 focus:outline-none focus:shadow-[0_0_10px_var(--neon-blue)] transition-shadow" placeholder="你的名字">
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 mb-2">邮箱</label>
+                                <input type="email" class="w-full bg-gray-800/50 border border-cyan-400 rounded px-4 py-3 text-gray-300 focus:outline-none focus:shadow-[0_0_10px_var(--neon-blue)] transition-shadow" placeholder="your@email.com">
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 mb-2">消息</label>
+                                <textarea rows="4" class="w-full bg-gray-800/50 border border-cyan-400 rounded px-4 py-3 text-gray-300 focus:outline-none focus:shadow-[0_0_10px_var(--neon-blue)] transition-shadow resize-none" placeholder="你想说什么..."></textarea>
+                            </div>
+                            <button type="submit" class="cyber-btn w-full neon-border py-3 text-cyan-400 font-semibold rounded">
+                                <i class="fas fa-paper-plane mr-2"></i>发送消息
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="py-8 px-4 border-t border-cyan-400/20">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="mb-4">
+                <span class="text-cyan-400 text-lg font-bold">
+                    <i class="fas fa-bolt mr-2"></i>CYBER.DEV
+                </span>
+            </div>
+            <p class="text-gray-500 mb-4">
+                &copy; 2024 赛博开发者. 保留所有权利.
+            </p>
+            <p class="text-gray-600 text-sm">
+                <span class="text-cyan-400">[</span> 构建未来，一行代码 <span class="text-cyan-400">]</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('nav-scrolled');
+            } else {
+                navbar.classList.remove('nav-scrolled');
+            }
+        });
+
+        // 移动端菜单切换
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // 关闭移动端菜单
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // 技能进度条动画
+        const skillBars = document.querySelectorAll('.skill-progress');
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const skillObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const width = entry.target.getAttribute('data-width');
+                    entry.target.style.width = width + '%';
+                }
+            });
+        }, observerOptions);
+
+        skillBars.forEach(bar => {
+            bar.style.width = '0%';
+            skillObserver.observe(bar);
+        });
+
+        // 项目详情展开
+        const toggleButtons = document.querySelectorAll('.toggle-details');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const details = button.nextElementSibling;
+                details.classList.toggle('active');
+                const icon = button.querySelector('i');
+                if (details.classList.contains('active')) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+            });
+        });
+
+        // 联系表单提交
+        const contactForm = document.getElementById('contact-form');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('消息已发送！（这是一个演示，实际需要后端支持）');
+            contactForm.reset();
+        });
+
+        // 添加打字机效果到Hero副标题
+        const typewriterText = 'CYBER DEVELOPER';
+        const typewriterElement = document.querySelector('.neon-pink-text');
+        let typewriterIndex = 0;
+
+        function typeWriter() {
+            if (typewriterIndex < typewriterText.length) {
+                typewriterElement.textContent = typewriterText.substring(0, typewriterIndex + 1);
+                typewriterIndex++;
+                setTimeout(typeWriter, 150);
+            } else {
+                setTimeout(() => {
+                    typewriterIndex = 0;
+                    typeWriter();
+                }, 3000);
+            }
+        }
+
+        // 页面加载完成后启动打字机效果
+        window.addEventListener('load', () => {
+            setTimeout(typeWriter, 1000);
+        });
+    </script>
+</body>
+</html>
